@@ -1,16 +1,10 @@
 <?php
 include '../config/koneksi.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = $_POST['id'];
+$id = $_GET['id'];
+$stmt =  $pdo->prepare("DELETE FROM users WHERE id = ? ");
+$stmt->execute([$id]);
 
-    $sql = "DELETE FROM users WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $id]);
-    echo "User berhasil dihapus!";
-}
+
+header('Location: read_users.php');
 ?>
-<form method="POST">
-    <input type="hidden" name="id" placeholder="User ID" required>
-    <button type="submit">Delete User</button>
-</form>

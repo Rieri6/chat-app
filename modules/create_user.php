@@ -3,16 +3,16 @@ include '../config/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $email = $_POST['email'];
 
-    $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $username, 'password' => $password]);
-    echo "User berhasil dibuat!";
+    $stmt = $pdo->prepare("INSERT INTO users (username, email)");
+    $stmt->execute([$username, $email]);
+
+    header("Location: read_users.php");
 }
 ?>
 <form method="POST">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Create User</button>
+   Username: <input type="text" name="username" placeholder="Username" required>
+    <input type="email" name="email" placeholder="email" required>
+    <button type="submit">Simpan</button>
 </form>

@@ -1,18 +1,25 @@
 <?php
 include '../config/koneksi.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = $_POST['id'];
-    $username = $_POST['username'];
+$id = $_GET['id'];
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute($id);
+$user = $stmt->fetch();
 
-    $sql = "UPDATE users SET username = :username WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['username' => $username, 'id' => $id]);
-    echo "User berhasil diperbarui!";
+if($_SERVER['REQUEST_METHOD'] == "POST") {
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+
+    $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
+    $stmt->execute([$username, $email, $id]);
+
+    header("Location: read_users.php");
 }
 ?>
+
+
 <form method="POST">
-    <input type="hidden" name="id" placeholder="User ID" required>
-    <input type="text" name="username" placeholder="Username Baru" required>
-    <button type="submit">Update User</button>
+    Username: <input type="text" name="username" value="<?= $user['username']?>" required>
+    Email: <input type="email" name="email" value="<?= $user['email']?>" required>
+    <button type="submit">Update</button>
 </form>

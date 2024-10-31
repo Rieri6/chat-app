@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'chat_gpp';
 $username = 'root';
-$password = 'rudi123';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

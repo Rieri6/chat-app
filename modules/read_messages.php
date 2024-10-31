@@ -4,7 +4,7 @@ require "../config/koneksi.php";
 $chat_id = $_GET['chat_id'];
 $stmt = $pdo->prepare("SELECT * FROM messages WHERE chat_id = ?");
 $stmt->execute([$chat_id]);
-$messages = $stmt->fetch();
+$messages = $stmt->fetchAll();
 ?>
 
 <table>
@@ -22,7 +22,7 @@ $messages = $stmt->fetch();
                 $user_stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
                 $user_stmt->execute([$message['user_id']]);
                 $user = $user_stmt->fetch();
-                echo $user['Username'];
+                echo $user['username'];
                 ?>
             </td>
             <td><?= $message['message']?></td>

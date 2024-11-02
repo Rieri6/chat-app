@@ -3,7 +3,7 @@ include '../config/koneksi.php';
 
 $id = $_GET['id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute($id);
+$stmt->execute([$id]);
 $user = $stmt->fetch();
 
 if($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -14,6 +14,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
     $stmt->execute([$username, $email, $id]);
 
     header("Location: read_users.php");
+    exit();
 }
 ?>
 

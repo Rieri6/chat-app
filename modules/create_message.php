@@ -1,38 +1,19 @@
 <?php
-require '../config/koneksi.php';
+session_start();
+require "../config/koneksi.php";
 
-$stmt = $pdo->query("SELECT * FROM chats");
-$chats = $stmt->fetchAll();
-
-
-$stmt =  $pdo->query("SELECT * FROM users");
-$users = $stmt->fetchAll();
-
-if($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $chat_id = $_POST['chat_id'];
-    $user_id = $_POST['user_id'];
-    $message = $_POST['message'];
+    $user_id = $_SESSION['iduser'] ?? null; 
+    $message = trim($_POST['message']);
 
-    $stmt =  $pdo->prepare("INSERT INTO messages (chat_id, user_id, message) VALUES (?,?,?)");
-    $stmt->execute([$chat_id, $user_id, $message]);
+    if ($user_id && $chat_id && !empty($message)) {
+        $stmt = $pdo->prepare("INSERT INTO messages (chat_id, user_id, message, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([$chat_id, $user_id, $message]);
 
-    header("Location: read_messages.php?chat_id=$chat_id");
+        header("Location: ../index.php?chat_id=$chat_id");
+        exit();
+    } else {
+        echo "Gagal mengirim pesan. Pastikan semua data diisi." ;
+    }
 }
-?>
-
-<form method="POST">
-    Chat:
-    <select name="chat_id" id="">
-    <?php foreach ($chats as $chat) :?>
-    <option value="<?= $chat['id']?>"><?= $chat['chat_name'] ?></option>
-    <?php endforeach; ?>
-    </select>
-    User:
-    <select name="user_id" id="">
-    <?php foreach ($users as $user) :?>
-    <option value="<?= $user['id']?>"><?= $user['username'] ?></option>
-    <?php endforeach; ?>
-    </select>
-    Message : <textarea name="message" require></textarea>
-    <button type="sumbit">Kirim</button>
-</form>

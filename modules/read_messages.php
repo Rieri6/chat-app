@@ -1,32 +1,26 @@
 <?php
+session_start();
 require "../config/koneksi.php";
 
-$chat_id = $_GET['chat_id'];
-$stmt = $pdo->prepare("SELECT * FROM messages WHERE chat_id = ?");
-$stmt->execute([$chat_id]);
-$messages = $stmt->fetchAll();
-?>
+$chat_id = $_GET['chat_id'] ?? null;
 
-<table>
-    <tr>
-        <td>ID</td>
-        <td>User</td>
-        <td>Message</td>
-        <td>Waktu</td>
-    </tr>
-    <?php foreach($messages as $message):?>
-        <tr>
-            <td><?= $message['id']?></td>
-            <td>
-                <?php
-                $user_stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
-                $user_stmt->execute([$message['user_id']]);
-                $user = $user_stmt->fetch();
-                echo $user['username'];
-                ?>
-            </td>
-            <td><?= $message['message']?></td>
-            <td><?= $message['created_at']?></td>
-        </tr>
-        <?php endforeach; ?>
-</table>
+if ($chat_id) {
+    $stmt = $pdo->prepare("SELECT messages.message, messages.created_at, users.username 
+                           FROM messages 
+                           JOIN users ON messages.user_id = users.id 
+                           WHERE messages.chat_id = ? 
+                           ORDER BY messages.created_at ASC");
+    $stmt->execute([$chat_id]);
+    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $currentUsername = $_SESSION['username'] ?? '';
+
+    foreach ($messages as $message) {
+        $class = ($message['username'] == $currentUsername) ? 'message-right' : 'message-left';
+        echo "<div class='message-box $class'>";
+        echo "<strong>" . htmlspecialchars($message['username']) . "</strong>";
+        echo "<p>" . htmlspecialchars($message['message']) . "</p>";
+        echo "<small class='text-muted'>" . $message['created_at'] . "</small>";
+        echo "</div>";
+    }
+}

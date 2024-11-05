@@ -14,7 +14,7 @@ $chats = $stmt->fetchAll();
 
 $messages = [];
 if ($chat_id) {
-    $stmtMessages = $pdo->prepare("SELECT messages.message, messages.created_at, users.username 
+    $stmtMessages = $pdo->prepare("SELECT messages.id, messages.message, messages.created_at, users.username 
                                    FROM messages 
                                    JOIN users ON messages.user_id = users.id 
                                    WHERE messages.chat_id = ? 
@@ -31,21 +31,66 @@ if ($chat_id) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <title>Chat Room</title>
     <style>
-        .message-box {
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            max-width: 60%;
-        }
-        .message-right {
-            background-color: #66cc91; 
-            margin-left: auto;
-            text-align: right;
-        }
-        .message-left {
-            background-color: #448dee; 
-            text-align: left;
-        }
+.message-box {
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    max-width: 70%;
+    font-size: 14px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message-left {
+    background-color: #f1f3f4;
+    text-align: left;
+    color: #333;
+    width: 40%;
+    border-top-right-radius: 40%;
+    border-top-left-radius: 10%;
+    margin-right: auto;
+}
+.message-right {
+    background-color: #0078d7;
+    color: white;
+    text-align: left;
+    width: 40%;
+    border-top-left-radius: 40%;
+    border-top-right-radius: 10%;
+    margin-left: auto;
+}
+.message-box strong {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: #4a4a4a;
+}
+
+.message-box small {
+    display: block;
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 5px;
+    text-align: right;
+}
+.chat-box {
+    background-color: #e5e6ea;
+    padding: 15px;
+    border-radius: 8px;
+    height: 500px;
+    overflow-y: auto;
+}
+
+form input[type="text"] {
+    border-radius: 20px;
+    padding: 8px 15px;
+}
+
+form button {
+    border-radius: 20px;
+    padding: 8px 15px;
+}
+
     </style>
 </head>
 <body>
@@ -65,10 +110,14 @@ if ($chat_id) {
                 <?php foreach ($messages as $message) : ?>
                     <?php
                     $currentUsername = $_SESSION['username'] ?? '';
-                    $class = ($message['username'] === $currentUsername) ? 'message-right' : 'message-left';
+                    if ($message['username'] === $currentUsername) {
+                        $class = 'message-right';
+                    } else {
+                        $class = ($message['id'] % 2 === 0) ? 'message-left' : 'message-right';
+                    }
                     ?>
                     <div class="d-flex mb-3 <?= $class; ?>">
-                        <div class="message <?= $class; ?>">
+                        <div class="message-box <?= $class; ?>">
                             <strong><?= htmlspecialchars($message['username']); ?></strong>
                             <p class="mb-1"><?= htmlspecialchars($message['message']); ?></p>
                             <small class="text-muted"><?= $message['created_at']; ?></small>

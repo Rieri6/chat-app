@@ -2,11 +2,12 @@
 session_start();
 require 'config/koneksi.php';
 
-if (isset($_SESSION['success_message'])) {
-    echo "<script>alert('" . $_SESSION['success_message'] . "');</script>";
-    unset($_SESSION['success_message']);
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
 }
 
+$currentUsername = $_SESSION['username'];
 $chat_id = $_GET['chat_id'] ?? null;
 
 $stmt = $pdo->query("SELECT * FROM chats");
@@ -29,68 +30,33 @@ if ($chat_id) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
     <title>Chat Room</title>
     <style>
-.message-box {
-    padding: 10px 14px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    max-width: 70%;
-    font-size: 14px;
-    position: relative;
-    word-wrap: break-word;
-}
-
-.message-left {
-    background-color: #f1f3f4;
-    text-align: left;
-    color: #333;
-    width: 40%;
-    border-top-right-radius: 40%;
-    border-top-left-radius: 10%;
-    margin-right: auto;
-}
-.message-right {
-    background-color: #0078d7;
-    color: white;
-    text-align: left;
-    width: 40%;
-    border-top-left-radius: 40%;
-    border-top-right-radius: 10%;
-    margin-left: auto;
-}
-.message-box strong {
-    display: block;
-    font-size: 12px;
-    margin-bottom: 4px;
-    color: #4a4a4a;
-}
-
-.message-box small {
-    display: block;
-    font-size: 11px;
-    color: #aaa;
-    margin-top: 5px;
-    text-align: right;
-}
-.chat-box {
-    background-color: #e5e6ea;
-    padding: 15px;
-    border-radius: 8px;
-    height: 500px;
-    overflow-y: auto;
-}
-
-form input[type="text"] {
-    border-radius: 20px;
-    padding: 8px 15px;
-}
-
-form button {
-    border-radius: 20px;
-    padding: 8px 15px;
-}
-
+        .message-box {
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            max-width: 60%;
+        }
+        .message-right {
+            background-color: #66cc91; 
+            margin-left: auto;
+            text-align: right;
+            width: 40%;
+            color: white;
+        }
+        .message-left {
+            background-color: #448dee; 
+            text-align: left;
+            width: 40%;
+            color: white;
+        }
+        .chat-box {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -109,12 +75,7 @@ form button {
             <?php if (!empty($messages)) : ?>
                 <?php foreach ($messages as $message) : ?>
                     <?php
-                    $currentUsername = $_SESSION['username'] ?? '';
-                    if ($message['username'] === $currentUsername) {
-                        $class = 'message-right';
-                    } else {
-                        $class = ($message['id'] % 2 === 0) ? 'message-left' : 'message-right';
-                    }
+                    $class = ($message['username'] === $currentUsername) ? 'message-right' : 'message-left';
                     ?>
                     <div class="d-flex mb-3 <?= $class; ?>">
                         <div class="message-box <?= $class; ?>">
@@ -132,9 +93,9 @@ form button {
             <input type="hidden" name="chat_id" value="<?= htmlspecialchars($chat_id); ?>">
             <input type="text" name="message" class="form-control me-2" placeholder="Tulis pesan..." required>
             <button type="submit" class="btn btn-primary">Kirim</button>
-            <a href="login.php" class="btn btn-secondary ms-2">Balik</a>
+            <a href="logout.php" class="btn btn-secondary ms-2">Logout</a>
         </form>
-        <form action="modules/creat_chat.php" method="POST" class="mt-3">
+        <form action="modules/create_chat.php" method="POST" class="mt-3">
             <input type="text" name="chat_name" class="form-control" placeholder="Nama Chat Baru" required>
             <button type="submit" class="btn btn-success mt-2">Buat</button>
         </form>

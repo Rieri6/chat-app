@@ -12,6 +12,8 @@ if (isset($_POST['btn'])) {
 
   if ($result) {
     $_SESSION['iduser'] = $result['id'];
+    $_SESSION['username'] = $result['username']; 
+
     header("Location: index.php");
     exit();
   } else {
@@ -19,6 +21,7 @@ if (isset($_POST['btn'])) {
   }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
